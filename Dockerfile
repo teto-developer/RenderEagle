@@ -2,25 +2,50 @@ FROM eclipse-temurin:17-jdk
 
 WORKDIR /server
 
-# ツール
-RUN apt-get update && apt-get install -y curl
+RUN apt-get update && apt-get install -y curl jq
 
-# Paper を直接DL（本物）
-RUN curl -L -o paper.jar https://fill-data.papermc.io/v1/objects/367f5088c7cc5c8f83cbededf4760622d4a27425be45611d3db6f11c75fac901/paper-1.21.11-126.jar
+# =========================
+# Paper 1.12.2 最新ビルド取得
+# =========================
+RUN BUILD=$(curl -s https://api.papermc.io/v2/projects/paper/versions/1.12.2 \
+| jq -r '.builds[-1]') \
+&& curl -L -o paper.jar \
+"https://api.papermc.io/v2/projects/paper/versions/1.12.2/builds/${BUILD}/downloads/paper-1.12.2-${BUILD}.jar"
 
-# plugins ディレクトリ
+# =========================
+# Pluginフォルダ
+# =========================
 RUN mkdir plugins
 
-# EaglerXServer v1.0.8
-RUN curl -L -o plugins/EaglerXServer.jar https://github.com/lax1dude/eaglerxserver/releases/download/v1.0.8/EaglerXServer.jar
+# EaglerXServer
+RUN curl -L -o plugins/EaglerXServer.jar \
+https://github.com/lax1dude/eaglerxserver/releases/download/v1.0.8/EaglerXServer.jar
 
-# オプションで追加したいもの（Max）
-RUN curl -L -o plugins/EaglerWeb.jar https://github.com/lax1dude/eaglerxserver/releases/download/v1.0.8/EaglerWeb.jar
-RUN curl -L -o plugins/EaglerXRewind.jar https://github.com/lax1dude/eaglerxserver/releases/download/v1.0.8/EaglerXRewind.jar
-RUN curl -L -o plugins/EaglerXBackendRPC.jar https://github.com/lax1dude/eaglerxserver/releases/download/v1.0.8/EaglerXBackendRPC.jar
-RUN curl -L -o plugins/EaglerMOTD.jar https://github.com/lax1dude/eaglerxserver/releases/download/v1.0.8/EaglerMOTD.jar
-RUN curl -L -o plugins/EaglerXPlan.jar https://github.com/lax1dude/eaglerxserver/releases/download/v1.0.8/EaglerXPlan.jar
-RUN curl -L -o plugins/EaglerXSupervisor.jar https://github.com/lax1dude/eaglerxserver/releases/download/v1.0.8/EaglerXSupervisor.jar
+# Web配信用
+RUN curl -L -o plugins/EaglerWeb.jar \
+https://github.com/lax1dude/eaglerxserver/releases/download/v1.0.8/EaglerWeb.jar
 
-# 起動スクリプト
-CMD sh -c "echo eula=true > eula.txt && java -Xms1G -Xmx1G -jar paper.jar --port $PORT"
+# MOTD強化
+RUN curl -L -o plugins/EaglerMOTD.jar \
+https://github.com/lax1dude/eaglerxserver/releases/download/v1.0.8/EaglerMOTD.jar
+
+# Rewind互換
+RUN curl -L -o plugins/EaglerXRewind.jar \
+https://github.com/lax1dude/eaglerxserver/releases/download/v1.0.8/EaglerXRewind.jar
+
+# RPC / 管理
+RUN curl -L -o plugins/EaglerXBackendRPC.jar \
+https://github.com/lax1dude/eaglerxserver/releases/download/v1.0.8/EaglerXBackendRPC.jar
+
+# 分析
+RUN curl -L -o plugins/EaglerXPlan.jar \
+https://github.com/lax1dude/eaglerxserver/releases/download/v1.0.8/EaglerXPlan.jar
+
+# 管理デーモン
+RUN curl -L -o plugins/EaglerXSupervisor.jar \
+https://github.com/lax1dude/eaglerxserver/releases/download/v1.0.8/EaglerXSupervisor.jar
+
+# =========================
+# 起動
+# =========================
+CMD sh -c "echo eula=true > eula.txt && java -Xms1G -Xmx1G -jar paper.jar"
