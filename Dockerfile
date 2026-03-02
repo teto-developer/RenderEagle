@@ -48,4 +48,4 @@ https://github.com/lax1dude/eaglerxserver/releases/download/v1.0.8/EaglerXSuperv
 # =========================
 # 起動
 # =========================
-CMD sh -c "echo eula=true > eula.txt && java -Xms256M -Xmx400M -jar paper.jar"
+CMD sh -c "echo eula=true > eula.txt && java -Xms256M -Xmx400M -Dserver.port=$PORT -jar paper.jar"
