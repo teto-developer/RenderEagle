@@ -1,5 +1,6 @@
-FROM eclipse-temurin:17-jdk
-WORKDIR /app
-COPY EagleWeb.jar .
-
-CMD ["sh", "-c", "java -jar EagleWeb.jar --port $PORT"]
+services:
+  - type: web
+    name: eaglerweb
+    env: java
+    buildCommand: echo build
+    startCommand: java -jar EagleWeb.jar
