@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: eaglerweb
+    env: java
+    buildCommand: echo build
+    startCommand: java -jar EagleWeb.jar
